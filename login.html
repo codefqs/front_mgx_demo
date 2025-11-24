@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>登录 - MGX</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./auth.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <!-- 左侧展示区 -->
+    <div class="auth-left">
+      <a href="index.html" class="auth-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span>MGX</span>
+      </a>
+      
+      <div class="auth-hero">
+        <h1 class="auth-hero-title">
+          梦想，聊天，创造<br/>
+          您的 <span class="gradient-text">全天候人工智能团队</span>
+        </h1>
+        <p class="auth-hero-subtitle">提供首家人工智能解决方案公司</p>
+        
+        <div class="auth-illustration">
+          <svg width="400" height="300" viewBox="0 0 400 300" fill="none">
+            <!-- Cute AI Characters -->
+            <!-- Character 1 - Blue -->
+            <circle cx="100" cy="150" r="50" fill="#60a5fa" opacity="0.8"/>
+            <circle cx="85" cy="140" r="8" fill="white"/>
+            <circle cx="115" cy="140" r="8" fill="white"/>
+            <circle cx="87" cy="142" r="4" fill="#1a1a1a"/>
+            <circle cx="117" cy="142" r="4" fill="#1a1a1a"/>
+            <path d="M85 165 Q100 175 115 165" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+            
+            <!-- Character 2 - Purple -->
+            <circle cx="200" cy="120" r="45" fill="#a78bfa" opacity="0.8"/>
+            <circle cx="188" cy="112" r="7" fill="white"/>
+            <circle cx="212" cy="112" r="7" fill="white"/>
+            <circle cx="190" cy="114" r="3" fill="#1a1a1a"/>
+            <circle cx="214" cy="114" r="3" fill="#1a1a1a"/>
+            <path d="M188 132 Q200 140 212 132" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            
+            <!-- Character 3 - Orange -->
+            <ellipse cx="300" cy="140" rx="40" ry="55" fill="#fb923c" opacity="0.8"/>
+            <circle cx="288" cy="130" r="8" fill="white"/>
+            <circle cx="312" cy="130" r="8" fill="white"/>
+            <circle cx="290" cy="132" r="4" fill="#1a1a1a"/>
+            <circle cx="314" cy="132" r="4" fill="#1a1a1a"/>
+            <path d="M285 150 Q300 160 315 150" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M295 165 L305 165 L300 175 Z" fill="#fbbf24"/>
+            
+            <!-- Character 4 - Green -->
+            <circle cx="150" cy="220" r="35" fill="#34d399" opacity="0.8"/>
+            <circle cx="140" cy="213" r="6" fill="white"/>
+            <circle cx="160" cy="213" r="6" fill="white"/>
+            <circle cx="142" cy="215" r="3" fill="#1a1a1a"/>
+            <circle cx="162" cy="215" r="3" fill="#1a1a1a"/>
+            <path d="M140 228 Q150 235 160 228" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" fill="none"/>
+            
+            <!-- Character 5 - Gray -->
+            <circle cx="260" cy="200" r="38" fill="#94a3b8" opacity="0.8"/>
+            <circle cx="248" cy="193" r="7" fill="white"/>
+            <circle cx="272" cy="193" r="7" fill="white"/>
+            <circle cx="250" cy="195" r="3" fill="#1a1a1a"/>
+            <circle cx="274" cy="195" r="3" fill="#1a1a1a"/>
+            <path d="M248 210 Q260 218 272 210" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            
+            <!-- Sparkles -->
+            <path d="M50 80 L52 88 L60 90 L52 92 L50 100 L48 92 L40 90 L48 88 Z" fill="#fbbf24" opacity="0.6"/>
+            <path d="M340 60 L341 65 L346 66 L341 67 L340 72 L339 67 L334 66 L339 65 Z" fill="#a78bfa" opacity="0.6"/>
+            <path d="M180 50 L181 54 L185 55 L181 56 L180 60 L179 56 L175 55 L179 54 Z" fill="#60a5fa" opacity="0.6"/>
+            <path d="M320 180 L321 184 L325 185 L321 186 L320 190 L319 186 L315 185 L319 184 Z" fill="#fb923c" opacity="0.6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧表单区 -->
+    <div class="auth-right">
+      <div class="auth-form-container">
+        <h2 class="auth-form-title">欢迎回来</h2>
+        
+        <button class="google-btn" type="button" data-action="googleLogin">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>使用 Google 登录</span>
+        </button>
+
+        <div class="divider">
+          <span>或使用邮箱登录</span>
+        </div>
+
+        <form class="auth-form" id="loginForm">
+          <div class="form-group">
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="邮箱" 
+              required 
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="密码" 
+              required 
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-footer">
+            <p class="auth-link-text">
+              还没有账户？<a href="register.html" class="auth-link">创建您的账户</a>
+            </p>
+            <a href="#" class="forgot-password">忘记密码?</a>
+          </div>
+
+          <button type="submit" class="submit-btn">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="./auth.js"></script>
+</body>
+</html>

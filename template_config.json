@@ -1,0 +1,14 @@
+{
+  "description": "A specialized template for product prototype design, focusing on interface aesthetics and functional rationality",
+  "required_fields": [],
+  "required_files": [
+    "index.html",
+    "style.css",
+    "script.js",
+    "README.md"
+  ],
+  "lang": "HTML",
+  "framework": "HTML5",
+  "name": "prototype_template",
+  "scene": "prototype_design"
+}
