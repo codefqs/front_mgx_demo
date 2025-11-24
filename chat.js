@@ -1,6 +1,37 @@
 // Chat Page JavaScript
 const API_BASE_URL = 'http://localhost:8080';
 
+// 防抖函数
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Markdown 渲染辅助函数
+function renderMarkdown(text) {
+    if (typeof marked === 'undefined') {
+        console.warn('marked.js 未加载，使用纯文本');
+        return escapeHtml(text);
+    }
+    
+    try {
+        return marked.parse(text);
+    } catch (e) {
+        console.error('Markdown 解析错误:', e);
+        return escapeHtml(text);
+    }
+}
+
+// 流式消息渲染缓存
+const streamingRenderCache = new Map();
+
 /**
  * Get request headers with JWT and user ID for authenticated requests
  */
@@ -408,7 +439,7 @@ function createStreamingMessage() {
                 <span class="message-name">MGX AI</span>
                 <span class="message-time">${timeStr}</span>
             </div>
-            <div class="message-text"></div>
+            <div class="message-text" data-raw-text=""></div>
         </div>
     `;
     
@@ -419,13 +450,98 @@ function createStreamingMessage() {
 }
 
 /**
- * Append content to streaming message
+ * Append content to streaming message (with markdown rendering)
+ * 使用防抖和智能渲染来避免频繁更新导致的抖动
  */
+let streamingRenderTimer = null;
+let streamingRenderQueue = new Map();
+
 function appendToStreamingMessage(element, content) {
-    if (element) {
-        element.textContent += content;
-        scrollToBottom();
+    if (!element) return;
+    
+    // 获取当前内容
+    const currentText = element.dataset.rawText || '';
+    const newText = currentText + content;
+    element.dataset.rawText = newText;
+    
+    // 存储到队列中，使用防抖延迟渲染
+    streamingRenderQueue.set(element, newText);
+    
+    // 清除之前的定时器
+    if (streamingRenderTimer) {
+        clearTimeout(streamingRenderTimer);
     }
+    
+    // 检查是否在代码块中（需要更频繁的更新）
+    const inCodeBlock = (newText.match(/```/g) || []).length % 2 === 1;
+    
+    // 如果在代码块中，延迟较短；否则延迟较长
+    const delay = inCodeBlock ? 50 : 150;
+    
+    streamingRenderTimer = setTimeout(() => {
+        streamingRenderQueue.forEach((text, el) => {
+            // 检查是否有代码块
+            const hasCodeBlock = text.includes('```');
+            
+            // 如果包含代码块，检查代码块是否完整
+            let shouldRender = true;
+            if (hasCodeBlock) {
+                const codeBlockMatches = text.match(/```[\s\S]*?```/g);
+                const allCodeBlocksComplete = codeBlockMatches && 
+                    codeBlockMatches.length === (text.match(/```/g) || []).length / 2;
+                
+                // 如果代码块不完整，暂时不渲染 markdown，只显示纯文本
+                if (!allCodeBlocksComplete) {
+                    // 找到最后一个不完整的代码块位置
+                    const lastCodeBlockStart = text.lastIndexOf('```');
+                    if (lastCodeBlockStart !== -1) {
+                        const beforeCodeBlock = text.substring(0, lastCodeBlockStart);
+                        const inCodeBlockText = text.substring(lastCodeBlockStart);
+                        
+                        // 只渲染代码块之前的部分
+                        if (beforeCodeBlock.trim()) {
+                            el.innerHTML = renderMarkdown(beforeCodeBlock);
+                            // 添加代码块预览（不渲染 markdown）
+                            const codePreview = document.createElement('pre');
+                            codePreview.className = 'code-preview';
+                            codePreview.innerHTML = '<code>' + escapeHtml(inCodeBlockText.replace(/```/g, '')) + '</code>';
+                            el.appendChild(codePreview);
+                        } else {
+                            // 如果只有代码块，直接显示
+                            el.innerHTML = '<pre class="code-preview"><code>' + escapeHtml(inCodeBlockText.replace(/```/g, '')) + '</code></pre>';
+                        }
+                        shouldRender = false;
+                    }
+                }
+            }
+            
+            if (shouldRender) {
+                // 完整渲染 markdown
+                el.innerHTML = renderMarkdown(text);
+                
+                // 高亮代码块（只高亮未高亮的）
+                if (typeof hljs !== 'undefined') {
+                    setTimeout(() => {
+                        el.querySelectorAll('pre code').forEach((block) => {
+                            if (!block.classList.contains('hljs') && !block.parentElement.classList.contains('code-preview')) {
+                                try {
+                                    hljs.highlightElement(block);
+                                } catch (e) {
+                                    console.warn('代码高亮失败:', e);
+                                }
+                            }
+                        });
+                    }, 10);
+                }
+            }
+        });
+        
+        streamingRenderQueue.clear();
+        scrollToBottom();
+    }, delay);
+    
+    // 立即更新滚动位置（不等待渲染）
+    scrollToBottom();
 }
 
 /**
@@ -467,6 +583,16 @@ function addMessage(role, content) {
         name = 'MGX AI';
     }
     
+    // 对于 AI 消息，渲染 markdown；对于用户消息，使用纯文本
+    let messageContent;
+    if (role === 'assistant') {
+        // AI 消息：渲染 markdown
+        messageContent = renderMarkdown(content);
+    } else {
+        // 用户消息：使用纯文本（转义 HTML）
+        messageContent = escapeHtml(content);
+    }
+    
     messageDiv.innerHTML = `
         <div class="message-avatar">${avatarContent}</div>
         <div class="message-content">
@@ -474,11 +600,26 @@ function addMessage(role, content) {
                 <span class="message-name">${name}</span>
                 <span class="message-time">${timeStr}</span>
             </div>
-            <div class="message-text">${escapeHtml(content)}</div>
+            <div class="message-text">${messageContent}</div>
         </div>
     `;
     
     chatMessages.appendChild(messageDiv);
+    
+    // 高亮代码块（如果是 AI 消息）
+    if (role === 'assistant' && typeof hljs !== 'undefined') {
+        setTimeout(() => {
+            messageDiv.querySelectorAll('pre code').forEach((block) => {
+                if (!block.classList.contains('hljs')) {
+                    try {
+                        hljs.highlightElement(block);
+                    } catch (e) {
+                        console.warn('代码高亮失败:', e);
+                    }
+                }
+            });
+        }, 10);
+    }
     
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -802,6 +943,25 @@ function addMessageToDisplay(role, content, timestamp) {
         name = 'MGX AI';
     }
     
+    // 对于 AI 消息，渲染 markdown；对于用户消息，使用纯文本
+    let messageContent;
+    if (role === 'assistant') {
+        // AI 消息：渲染 markdown
+        messageContent = renderMarkdown(content);
+        // 高亮代码块
+        if (typeof hljs !== 'undefined') {
+            setTimeout(() => {
+                const codeBlocks = messageDiv.querySelectorAll('pre code');
+                codeBlocks.forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }, 0);
+        }
+    } else {
+        // 用户消息：使用纯文本（转义 HTML）
+        messageContent = escapeHtml(content);
+    }
+    
     messageDiv.innerHTML = `
         <div class="message-avatar">${avatarContent}</div>
         <div class="message-content">
@@ -809,7 +969,7 @@ function addMessageToDisplay(role, content, timestamp) {
                 <span class="message-name">${name}</span>
                 <span class="message-time">${timeStr}</span>
             </div>
-            <div class="message-text">${escapeHtml(content)}</div>
+            <div class="message-text">${messageContent}</div>
         </div>
     `;
     
@@ -1040,7 +1200,7 @@ function updateCreditsDisplay() {
     
     // Simulate credits (in real app, this would come from backend)
     const totalCredits = 500;
-    const remainingCredits = 334.58;
+    const remainingCredits = 0;
     const percentage = (remainingCredits / totalCredits) * 100;
     
     if (creditsProgress) {

@@ -7,6 +7,46 @@
   <title>聊天 - MGX</title>
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./chat.css" />
+  <!-- Markdown 渲染库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js" onload="initMarked()" onerror="console.error('❌ Marked.js 加载失败')"></script>
+  <!-- 代码高亮库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="initHighlight()" onerror="console.error('❌ Highlight.js 加载失败')"></script>
+  <!-- 配置 marked.js 和 highlight.js -->
+  <script>
+    function initMarked() {
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({
+          gfm: true,           // 启用 GitHub Flavored Markdown
+          breaks: true,       // 将换行符转换为 <br>
+          headerIds: true,    // 为标题添加 ID
+          mangle: false       // 不混淆邮箱地址
+        });
+        console.log('✅ Marked.js 已加载并配置，版本:', marked.version || 'unknown');
+      } else {
+        console.error('❌ Marked.js 未加载');
+      }
+    }
+    
+    function initHighlight() {
+      if (typeof hljs !== 'undefined') {
+        hljs.configure({
+          languages: ['javascript', 'python', 'java', 'cpp', 'c', 'go', 'html', 'css', 'json', 'bash', 'sql']
+        });
+        console.log('✅ Highlight.js 已加载并配置');
+      } else {
+        console.error('❌ Highlight.js 未加载');
+      }
+    }
+    
+    // 如果脚本已经加载（同步加载的情况）
+    if (typeof marked !== 'undefined') {
+      initMarked();
+    }
+    if (typeof hljs !== 'undefined') {
+      initHighlight();
+    }
+  </script>
 </head>
 <body>
   <!-- 顶部导航栏 -->
@@ -267,7 +307,7 @@
           <div class="credits-bar">
             <div class="credits-progress" id="creditsProgress" style="width: 67.09%"></div>
           </div>
-          <div class="credits-amount" id="creditsAmount">334.58 剩余</div>
+          <div class="credits-amount" id="creditsAmount">0 剩余</div>
         </div>
       </div>
     </div>
