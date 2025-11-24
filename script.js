@@ -1,5 +1,6 @@
 // Main JavaScript file for MGX website clone
-const API_BASE_URL = 'http://localhost:8080';
+// API_BASE_URL is set by config.js
+const API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080';
 
 /**
  * Get request headers with JWT and user ID for authenticated requests
